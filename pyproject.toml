@@ -4,6 +4,8 @@ version = "0.1.0"
 description = ""
 authors = ["Artyom <amordashov@gmail.com>"]
 readme = "README.md"
+repository = "https://github.com/yuvv2/mlopsHW"
+
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -12,6 +14,44 @@ pandas = "^2.2.0"
 scikit-learn = "^1.4.1.post1"
 numpy = "^1.26.4"
 
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.6.0"
+pytest = "^7.4.4"
+
+[tool.black]
+line-length = 90
+target-version = ["py311"]
+
+[tool.isort]
+src_paths = ["ds_project"]
+profile = "black"
+line_length = 90
+lines_after_imports = 2
+
+[tool.flake8]
+max-line-length = 90
+ignore = ['E203', 'E501', 'W503', 'B950']
+max-complexity = 12
+select = ['B', 'C', 'E', 'F', 'W', 'B9']
+per-file-ignores = [
+    # for easier imports to __init__ without __all__
+    '**/__init__.py: F401',
+    # file to define custom types
+    'types.py: F401',
+]
+count = true
+
+[tool.nbqa.config]
+black = "pyproject.toml"
+isort = "pyproject.toml"
+flake8 = "pyproject.toml"
+
+[tool.nbqa.addopts]
+flake8 = ["--extend-ignore=E402"]
+
+[tool.nbqa.mutate]
+black = 1
+isort = 1
 
 [build-system]
 requires = ["poetry-core"]
