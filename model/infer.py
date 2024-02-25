@@ -23,7 +23,7 @@ def model_infer(model, test_df: pd.DataFrame) -> pd.DataFrame:
 if __name__ == "__main__":
     current_file_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     data_path = os.path.join(current_file_dir, "data", "test.csv")
-    model_path = os.path.join(current_file_dir, "data", "trained_model.sav")
+    model_path = os.path.join(current_file_dir, "model", "trained_model.sav")
 
     preds_path = os.path.join(current_file_dir, "data", "predictions.csv")
 

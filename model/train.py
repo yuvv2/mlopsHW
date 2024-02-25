@@ -22,7 +22,7 @@ def model_train(train_df: pd.DataFrame) -> RandomForestClassifier:
 if __name__ == "__main__":
     current_file_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     data_path = os.path.join(current_file_dir, "data", "train.csv")
-    model_path = os.path.join(current_file_dir, "data", "trained_model.sav")
+    model_path = os.path.join(current_file_dir, "model", "trained_model.sav")
 
     train_df = pd.read_csv(data_path)
     model = model_train(train_df)
