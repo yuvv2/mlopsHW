@@ -1,0 +1,9 @@
+data:
+  name: titanic
+  path: /data
+model:
+  n_estimators: 15
+  criterion: gini
+  max_depth: 10
+  n_jobs: None
+  random_state: 42
