@@ -14,7 +14,7 @@ def model_infer(model, test_df: pd.DataFrame, cfg: DictConfig) -> pd.DataFrame:
     target_col = "Survived"
 
     X_test = test_df.loc[:, cat_cols + num_cols].fillna({"Age": 0})
-    X_test_h = pd.get_dummies(X_test, columns=cat_cols)
+    X_test_h = pd.get_dummies(X_test, columns=cat_cols, dtype=float)
     y_test = test_df[target_col]
 
     preds = model.predict(X_test_h)

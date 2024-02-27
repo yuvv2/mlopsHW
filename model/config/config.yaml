@@ -15,3 +15,10 @@ model:
   verbose: 0
   warm_start: False
   ccp_alpha: 0.0
+
+train:
+  mlflow_server: http://localhost:8080/
+  experiment_name: rf_titanic
+
+infer:
+  mlflow_server: http://localhost:5001/
