@@ -5,7 +5,7 @@ import joblib
 import pandas as pd
 from dvc.api import DVCFileSystem
 from omegaconf import DictConfig
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, roc_auc_score
 
 
 def model_infer(model, test_df: pd.DataFrame, cfg: DictConfig) -> pd.DataFrame:
@@ -20,6 +20,7 @@ def model_infer(model, test_df: pd.DataFrame, cfg: DictConfig) -> pd.DataFrame:
     preds = model.predict(X_test_h)
 
     print("Accuracy = ", accuracy_score(y_test, preds))
+    print("Roc-Auc Score = ", roc_auc_score(y_test, preds))
     return preds
 
 
