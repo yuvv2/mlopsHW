@@ -1,28 +1,21 @@
 import os
+import shutil
 
 import hydra
 import joblib
-import matplotlib.pyplot as plt
 import mlflow
 import numpy as np
 import onnx
 import onnxruntime as rt
 import pandas as pd
-import seaborn as sns
 from dvc.api import DVCFileSystem
+from graph import get_hm, get_lr, get_roc
 from mlflow.models import infer_signature
 from omegaconf import DictConfig
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import (
-    RocCurveDisplay,
-    accuracy_score,
-    f1_score,
-    precision_score,
-    recall_score,
-)
-from sklearn.model_selection import learning_curve
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
 
 def model_train(train_df: pd.DataFrame, cfg: DictConfig) -> RandomForestClassifier:
@@ -51,32 +44,10 @@ def model_train(train_df: pd.DataFrame, cfg: DictConfig) -> RandomForestClassifi
     model.fit(X_train_h, y_train)
     y_val = model.predict(X_train_h)
 
-    # График 1
-    train_size, train_scores, _ = learning_curve(
-        model, X_train_h, y_train, train_sizes=[0.3, 0.6, 0.9]
-    )
+    fig1 = get_lr(model, X_train_h, y_train)
+    fig2 = get_hm(X_train_h)
+    fig3 = get_roc(y_train, y_val)
 
-    fig1, _ = plt.subplots()
-    plt.plot(train_size, np.mean(train_scores, axis=1))
-    fig1 = plt.gcf()
-
-    # График 2
-    fig2, _ = plt.subplots()
-    sns.heatmap(
-        X_train_h.corr(),
-        cmap=sns.diverging_palette(220, 10, as_cmap=True),
-        vmin=-1.0,
-        vmax=1.0,
-        square=True,
-    )
-    fig2 = plt.gcf()
-
-    # График 3
-    fig3, _ = plt.subplots()
-    RocCurveDisplay.from_predictions(y_train, y_val)
-    fig3 = plt.gcf()
-
-    # Делаем метрики
     accuracy = accuracy_score(y_train, y_val)
     precision = precision_score(y_train, y_val)
     recall = recall_score(y_train, y_val)
@@ -85,7 +56,6 @@ def model_train(train_df: pd.DataFrame, cfg: DictConfig) -> RandomForestClassifi
     mlflow.set_tracking_uri(cfg["train"]["mlflow_server"])
     mlflow.set_experiment(cfg["train"]["experiment_name"])
     with mlflow.start_run():
-        # Log the loss metric
         mlflow.log_metric("val_accuracy", accuracy)
         mlflow.log_metric("val_precision", precision)
         mlflow.log_metric("val_recall", recall)
@@ -97,9 +67,11 @@ def model_train(train_df: pd.DataFrame, cfg: DictConfig) -> RandomForestClassifi
 
         mlflow.set_tag("Training process", "Random Forest Classifier for Titanic Dataset")
 
-        # Infer the model signature
         initial_type = [("float_input", FloatTensorType([None, len(X_train_h.columns)]))]
-        onx_model = convert_sklearn(model, initial_types=initial_type)
+        options = {id(model): {"zipmap": False, "output_class_labels": True}}
+        onx_model = convert_sklearn(
+            model, initial_types=initial_type, target_opset=13, options=options
+        )
 
         with open("./model.onnx", "wb") as f:
             f.write(onx_model.SerializeToString())
@@ -114,6 +86,12 @@ def model_train(train_df: pd.DataFrame, cfg: DictConfig) -> RandomForestClassifi
         pred_onx = sess.run(None, {input_name: np.array(X_train_h).astype(np.float32)})[0]
 
         signature = infer_signature(X_train_h, pred_onx)
+
+        current_proj_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        data_path = os.path.join(current_proj_dir, "model", "model")
+        if os.path.isdir(data_path):
+            shutil.rmtree(data_path)
+
         mlflow.onnx.save_model(onnx_model=onnx_model, path="./model", signature=signature)
         mlflow.onnx.log_model(onnx_model, "model", signature=signature)
 
@@ -125,6 +103,8 @@ def main(cfg: DictConfig):
     current_file_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     data_path = os.path.join(current_file_dir, cfg["data"]["path"], "train.csv")
     model_path = os.path.join(current_file_dir, "model", "trained_model.sav")
+    if os.path.isfile(data_path):
+        os.remove(data_path)
 
     fs = DVCFileSystem(os.path.join(current_file_dir, "data"))
     fs.get_file("/data/train.csv", data_path)

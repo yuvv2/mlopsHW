@@ -17,8 +17,8 @@ model:
   ccp_alpha: 0.0
 
 train:
-  mlflow_server: http://localhost:8080/
+  mlflow_server: http://localhost:8081/
   experiment_name: rf_titanic
 
 infer:
-  mlflow_server: http://localhost:5001/
+  mlflow_server: http://localhost:5002/

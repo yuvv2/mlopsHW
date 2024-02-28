@@ -1,6 +1,7 @@
+.trained_model.sav
+.model.onnx
 outputs/
 mlruns/
 mlartifacts/
 model/
-.trained_model.sav
-.model.onnx
+__pycache__/

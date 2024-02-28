@@ -2,3 +2,6 @@
 .venv
 .gitignore.swp
 model/outputs/
+model/trained_model.sav
+model/model.onnx
+triton/model_repository/titanic_classifier/1/model.onnx

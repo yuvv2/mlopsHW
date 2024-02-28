@@ -1,0 +1,28 @@
+name: "titanic_classifier"
+backend: "onnxruntime"
+max_batch_size: 8
+
+input [
+    {
+        name: "float_input"
+        data_type: TYPE_FP32
+        dims: [ 10 ]
+    }
+]
+
+output [
+    {
+        name: "probabilities"
+        data_type: TYPE_FP32
+        dims: [ 2 ]
+    }
+]
+
+instance_group [
+  {
+    count: 1
+    kind: KIND_CPU
+  }
+]
+
+dynamic_batching: { max_queue_delay_microseconds: 1000}
