@@ -29,6 +29,5 @@ def get_hm(X_train_h: pd.DataFrame):
 
 
 def get_roc(y_train, y_val: pd.DataFrame):
-    fig, _ = plt.subplots()
     RocCurveDisplay.from_predictions(y_train, y_val)
-    return fig
+    return plt.gcf()

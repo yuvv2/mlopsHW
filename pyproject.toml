@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "mlops"
+name = "model"
 version = "0.1.0"
 description = ""
 authors = ["Artyom <amordashov@gmail.com>"]
