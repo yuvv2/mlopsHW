@@ -43,7 +43,7 @@ All training information, plots and predictions will be on
 
 ### Triton setup
 
-1. As a start, model.onnx file is needed to be downloaded
+1. As a start, model.onnx file needs to be downloaded
 
 - $ dvc pull This command will download ALL necessary files from gdrive
 
