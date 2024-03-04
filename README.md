@@ -45,7 +45,10 @@ All training information, plots and predictions will be on
 
 1. As a start, model.onnx file needs to be downloaded
 
-- $ dvc pull This command will download ALL necessary files from gdrive
+- $ dvc fetch
+  {Path-to-Project}/triton/model_repository/titanic_classifier/1/model.onnx
+
+- $ dvc pull Those commands will download ALL necessary files from gdrive
 
 2. In folder {Path-to-Project}/triton run docker
 
